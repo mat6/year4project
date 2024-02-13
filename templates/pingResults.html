@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+<title>Ping Discovery Results</title>
+<body>
+    <form method="post" action="/versionScan">
+    {% for key in result.items()%}
+        {{key}}
+        <br>
+    {% endfor %}
+    <input type="submit" value="Submit">
+</body>
+</html>
