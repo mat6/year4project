@@ -26,7 +26,7 @@ def parsePing(result):
 
 #get cpe from version scan
 def parseVersion(result):
-    parsedResult = {}
+    #parsedResult = {}
     entries = []
     for key in result:
         if '.' in key:
@@ -36,12 +36,12 @@ def parseVersion(result):
                     for entry in subkey["cpe"]:
                         if not entry["cpe"] == "cpe:/o:linux:linux_kernel":
                             entries.append(entry["cpe"].replace("/","2.3:"))
-                    parsedResult[host] = entries
-    return parsedResult
+                    #parsedResult[host] = entries
+    return entries
 
 #get cpe from os scan
 def parseOS(result):
-    parsedResult = {}
+    #parsedResult = {}
     entries = []
     for key in result:
         if '.' in key:
@@ -49,8 +49,8 @@ def parseOS(result):
             for subkey in result[key]["osmatch"]:
                 if "cpe" in subkey:
                     entries.append(subkey["cpe"].replace("/","2.3:"))
-                    parsedResult[host] = entries
-    return parsedResult
+                    #parsedResult[host] = entries
+    return entries
 
 #regular ping scan
 def pingScan(target):
