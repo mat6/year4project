@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="/static/osScan.css">
+</head>
+<title>Home Network Security Analyzer</title>
+<body>
+    <div class="main">
+        <h1>OS Scan Results</h1>
+        <form method="post" action="/vulnCheck">
+            <ul class="list">
+                {% for key in result%}
+                <li class="item">
+                    <input type="checkbox" class="check" id="{{key}}" name="{{key}}" value="{{key}}">
+                    <label for="{{key}}" class="content">
+                        Possible Operating Systems for {{key}}:
+                        <ol class="osList" >
+                            {% for os in result[key] %}
+                                <li class="os">
+                                    {{os}},
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </label>
+                </li>
+                {% endfor %}
+            </ul>
+            <input type="submit" value="Check for Vulnerabilities">
+        </form>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import nmap,nvd
+import nmap,nvd,json
 from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
@@ -24,8 +24,7 @@ def index():
 
 @app.route("/pingScan")
 def ping():
-    form = pingForm()
-    return render_template("pingScan.html",form=form)
+    return render_template("pingScan.html")
 
 @app.route("/pingResults",methods=("GET","POST"))
 def pingResult():
@@ -55,8 +54,12 @@ def osScan():
         for target in request.form:
             result = nmap.osScan(target)
             results[target] = result
-            allResults.cpes[target] = nmap.parseOS(result)
+            allResults.cpes[target] = nmap.getCPEOS(result)
         allResults.osResults = results
+        print(json.dumps(results,indent=4))
+        results = nmap.parseOS(results)
+        print(json.dumps(results,indent=4))
+        print(allResults.cpes)
         return render_template("osScan.html",result=results)
     else: return redirect("/")
 
@@ -66,7 +69,10 @@ def vulnCheck():
         results = {}
         for hosts in request.form:
             if hosts in allResults.cpes:
-                    results[hosts] = nvd.getCVE(allResults.cpes[hosts])   
+                cves = nvd.getCVE(allResults.cpes[hosts])
+                results[hosts] = cves
+        print(results)
+        results = nvd.parseCVE(results)
         return render_template("vulnCheck.html",result=results)
     else: return redirect("/")
 

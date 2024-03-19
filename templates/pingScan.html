@@ -1,11 +1,19 @@
 <!doctype html>
 <html>
-<title>Scan Network</title>
+<head>
+    <link rel="stylesheet" href="/static/pingScan.css">
+</head>
+<title>Home Network Security Analyzer</title>
 <body>
-    <form method="post">
-        <label for="target">Target</label>
-        <input type="text" id="target" name="target">
-        <input type="submit" value="Scan">
-    </form>
+    <div class="main">
+        <h1>Scan Network</h1>
+        <form method="post" action="/pingResults">
+            <div class="form">
+                <label for="target">Target Network / Address </label>
+                <input type="text" id="target" name="target">
+            </div>
+            <input type="Submit" value="Start Scan">
+        </form>
+    </div>
 </body>
 </html>

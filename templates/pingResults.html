@@ -1,12 +1,23 @@
 <!doctype html>
 <html>
-<title>Ping Discovery Results</title>
+<head>
+    <link rel="stylesheet" href="/static/pingResult.css">
+</head>
+<title>Home Network Security Analyzer</title>
 <body>
-    <form method="post" action="/versionScan">
-    {% for key in result.items()%}
-        {{key}}
-        <br>
-    {% endfor %}
-    <input type="submit" value="Submit">
+    <div class="main">
+        <h1>Ping Discovery Results</h1>
+        <form method="post" action="/osScan">
+            <ul class="list">
+                {% for key in result%}
+                    <li class="ip">
+                        <input type="checkbox" class="check" id="{{key}}" name="{{key}}" value="{{key}}">
+                        <label for="{{key}}" class="address">{{result[key]["address"]}}</label>
+                    </li>
+                {% endfor %}
+            </ul>
+            <input type="submit" value="OS Scan">
+        </form>
+    </div>
 </body>
 </html>
