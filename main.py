@@ -1,7 +1,11 @@
-import nmap,nvd,json
+import nmap,nvd,json,os
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 
+if not os.path.exists("results"):
+    os.makedirs("results")
+if not os.path.exists("logs"):
+    os.makedirs("logs")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'WkaDs7TG5]>zxb*USJe^Ma'
 
