@@ -12,72 +12,89 @@ def writeLog(result,scantype):
 #remove empty results and empty fields
 def removeEmptyResult(result):
     for key in list(result.keys()):
-        if '.' in key:                                                         #check if entry is a host ( e.g: ip address x.x.x.x or domain name x.com)
+        if '.' in key:                  #check if entry is a host ( e.g: ip address x.x.x.x or domain name x.com)
             if "state" in "state" in result[key]:
-                if result[key]["state"]["state"] == "down":                             #remove hosts that are down
+                if result[key]["state"]["state"] == "down":     #remove hosts that are down
                     result.pop(key)
                     continue
             for subkey in list(result[key].keys()):
                 if ((result[key][subkey] is None) or (len(result[key][subkey]) == 0)):  #remove empty fields from result
                     result[key].pop(subkey)
 
-#parse ping results
+#parse ping results, returns dict of target : dict of address,hostname and state
 def parsePing(result):
     parsedResult = {}
     for key in list(result.keys()):
-        if '.' in key:
+        if '.' in key:                   #check if entry is a host ( e.g: ip address x.x.x.x or domain name x.com)
             host = {}
             host["address"] = key
-            if "hostname" in result[key]:
+            if "hostname" in result[key]:                               #check for hostnames and include them if present
                 host["hostname"] = result[key]["hostname"][0]["name"]
-            host["state"] = result[key]["state"]["state"]
+            host["state"] = result[key]["state"]["state"]               #state of host (up or down)
             parsedResult[key] = host
     return parsedResult
 
-#get cpe from version scan
+#get cpe from version scan, return dict of all cpe
 def parseVersion(result):
     entries = []
     for key in result:
-        if '.' in key:
+        if '.' in key:                          #check if entry is a host ( e.g: ip address x.x.x.x or domain name x.com)
             for subkey in result[key]["ports"]:
                 if "cpe" in subkey:
                     for entry in subkey["cpe"]:
-                        if not entry["cpe"] == "cpe:/o:linux:linux_kernel":
-                            entries.append(entry["cpe"].replace("/","2.3:"))
+                        #if not entry["cpe"] == "cpe:/o:linux:linux_kernel":
+                            entries.append(entry["cpe"].replace("/","2.3:")) #edit cpe returned by nmap for use with nvd api
     return entries
 
-#get cpe from os scan
+#get cpe of os and services found on ports from os scan 
 def getCPEOS(result):
     entries = []
     for key in result:
-        if '.' in key:
+        if '.' in key:                          #check if entry is a host ( e.g: ip address x.x.x.x or domain name x.com)
             count = 0
-            for subkey in result[key]["osmatch"]:
-                if count >= 5: 
-                    break
-                if "cpe" in subkey:
-                    entries.append(subkey["cpe"].replace("/","2.3:"))
-                    count += 1
-            for subkey in result[key]["ports"]:
-                if "cpe" in subkey and subkey["cpe"]:
-                    entries.append(subkey["cpe"].replace("/","2.3:"))
+            if "osmatch" in result[key]:            #get cpes of top 5 unique OS
+                for os in result[key]["osmatch"]:
+                    if count >= 5: 
+                        break
+                    if "cpe" in os:
+                        cpe = os["cpe"].replace("/","2.3:")
+                        entries.append(cpe)
+                        if cpe not in entries:
+                            count += 1
+            if "ports" in result[key]:                      #get cpe of all port services
+                for port in result[key]["ports"]:
+                    if "cpe" in port and port["cpe"]:
+                        entries.append(port["cpe"].replace("/","2.3:"))
     return entries
 
+#parse OS results for display in webpage
 def parseOS(result):
     parsedResult = {}
     for key in result:
-        count = 0
-        entries = []
-        for os in result[key][key]["osmatch"]:
-            if count >= 5:
-                break
-            entry = os["name"] + " - Accuracy:" + os["accuracy"]
-            entries.append(entry)
-            count += 1
-        for subkey in result[key][key]["ports"]:
-            if "cpe" in subkey and subkey["cpe"]:
-                    entries.append(subkey["cpe"].replace("/","2.3:"))
-        parsedResult[key] = entries
+        if "." in key:
+            count = 0
+            entries = []
+            if "osmatch" in result[key]:
+                for os in result[key]["osmatch"]:          #get cpes of top 5 unique OS
+                    if count >= 5:
+                        break
+                    entry = os["name"] + " - Accuracy:" + os["accuracy"] + " - CPE:"
+                    if "cpe" in os:
+                        entry += os["cpe"]
+                        find = [x for x in entries if os["cpe"] in x]           #increase count if cpe isn't already present
+                        if not find:
+                            count += 1
+                    else:
+                        entry += "No CPE Found"
+                    entries.append(entry)
+            if "ports" in result[key]:                 #get any cpes of services running
+                for subkey in result[key]["ports"]:
+                    if "cpe" in subkey and subkey["cpe"]:
+                            entries.append(subkey["cpe"])
+            if entries:
+                parsedResult[key] = entries
+            else:
+                parsedResult[key] = ["OS cound not be identified"]
     return parsedResult
 
 #regular ping scan

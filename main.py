@@ -1,14 +1,9 @@
 import nmap,nvd,json
 from flask import Flask, render_template, request, redirect, url_for
-from flask_wtf import FlaskForm
-from wtforms import StringField,SubmitField
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'WkaDs7TG5]>zxb*USJe^Ma'
-
-class pingForm(FlaskForm):
-    target = StringField("Target")
-    submit = SubmitField("Start Scan")
 
 class scanResults():
     pingResults = {}
@@ -20,10 +15,6 @@ allResults = scanResults()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
-
-@app.route("/pingScan")
-def ping():
     return render_template("pingScan.html")
 
 @app.route("/pingResults",methods=("GET","POST"))
@@ -32,7 +23,6 @@ def pingResult():
         target = request.form["target"]
         result = nmap.pingScan(target)
         allResults.pingResults = result
-        print(result)
         return render_template("pingResults.html",result=result)
     else: return redirect("/")
 
@@ -53,13 +43,10 @@ def osScan():
         results = {}
         for target in request.form:
             result = nmap.osScan(target)
-            results[target] = result
+            results = results | result
             allResults.cpes[target] = nmap.getCPEOS(result)
         allResults.osResults = results
-        print(json.dumps(results,indent=4))
         results = nmap.parseOS(results)
-        print(json.dumps(results,indent=4))
-        print(allResults.cpes)
         return render_template("osScan.html",result=results)
     else: return redirect("/")
 
@@ -67,12 +54,23 @@ def osScan():
 def vulnCheck():
     if request.method == "POST":
         results = {}
+        resultsLog = open("results/results " + datetime.today().strftime("%d-%m-%Y") + ".log","a")
+        resultsLog.write(str(datetime.now()) + " - Results of Home Network Security Analyzer - \n")
         for hosts in request.form:
             if hosts in allResults.cpes:
                 cves = nvd.getCVE(allResults.cpes[hosts])
                 results[hosts] = cves
-        print(results)
         results = nvd.parseCVE(results)
+        
+        for host in results:
+            resultsLog.write("---" + host + "---\n")
+            for cpe in results[host]:
+                resultsLog.write("CPE: " + cpe + "\n")
+                for cve in results[host][cpe]:
+                    print(cve)
+                    resultsLog.writelines("CVE: " + str(cve) + "\n\n")
+        resultsLog.write("\n-------------\n")
+        resultsLog.close
         return render_template("vulnCheck.html",result=results)
     else: return redirect("/")
 
