@@ -9,15 +9,19 @@
         <h1>OS Scan Results</h1>
         <form method="post" action="/vulnCheck">
             <ul class="list">
-                {% for key in result%}
+                {% for host in result%}
                 <li class="item">
-                    <input type="checkbox" class="check" id="{{key}}" name="{{key}}" value="{{key}}">
-                    <label for="{{key}}" class="content">
-                        Possible Operating Systems for {{key}}:
+                    {% if result[host][0] == "OS cound not be identified" %}
+                        <input type="checkbox" class="check" id="{{host}}" name="{{host}}" value="{{host}}" disabled="disabled">
+                    {% else %}
+                        <input type="checkbox" class="check" id="{{host}}" name="{{host}}" value="{{host}}">
+                    {% endif %}
+                    <label for="{{host}}" class="content">
+                        Possible Operating Systems for {{host}}:
                         <ol class="osList" >
-                            {% for os in result[key] %}
+                            {% for os in result[host] %}
                                 <li class="os">
-                                    {{os}},
+                                    {{os}}
                                 </li>
                             {% endfor %}
                         </ol>

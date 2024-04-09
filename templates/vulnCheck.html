@@ -1,10 +1,37 @@
 <!doctype html>
 <html>
+<head>
+    <link rel="stylesheet" href="/static/vulnCheck.css">
+</head>
 <title>Vulnerabilities</title>
 <body>
-    {% for key in result%}
-    {{result[key]}}
-    <br>
+    <div class="main">
+    {% for host in result%}
+        <h1>{{ host }}</h1>
+        <div class="list">
+        {%for cpe in result[host]%}
+            <h2>{{ cpe }}</h2>
+            <div class = "cpe">
+            {% for cve in result[host][cpe] %}
+                {% for item in cve %}
+                    <b>{{ item }}</b> : 
+                    {% if item == "NVD Url"%}
+                        <br><a href={{cve[item]}}>{{ cve[item] }}</a>
+                    {% elif item == "References to Advisories, Solutions, and Tools"%}
+                        {% for url in cve[item] %}
+                            <br><a href={{ url }}>{{ url }}</a>
+                        {% endfor%}
+                    {% else %}
+                        <br>{{ cve[item] }}
+                    {%endif%}
+                    <br>
+                {% endfor %}
+                <br>
+            {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
     {% endfor %}
+    </div>
 </body>
 </html>
