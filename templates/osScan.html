@@ -2,6 +2,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="/static/osScan.css">
+    <script type="text/javascript" src="/static/requireCheck.js"></script>
 </head>
 <title>Home Network Security Analyzer</title>
 <body>
@@ -12,9 +13,9 @@
                 {% for host in result%}
                 <li class="item">
                     {% if result[host][0] == "OS cound not be identified" %}
-                        <input type="checkbox" class="check" id="{{host}}" name="{{host}}" value="{{host}}" disabled="disabled">
+                        <input class="checkboxes" type="checkbox" class="check" id="{{host}}" name="{{host}}" value="{{host}}" disabled="disabled" onclick="requireCheck('checkboxes')" required>
                     {% else %}
-                        <input type="checkbox" class="check" id="{{host}}" name="{{host}}" value="{{host}}">
+                        <input class="checkboxes" type="checkbox" class="check" id="{{host}}" name="{{host}}" value="{{host}}" onclick="requireCheck('checkboxes')" required>
                     {% endif %}
                     <label for="{{host}}" class="content">
                         Possible Operating Systems for {{host}}:
@@ -31,6 +32,8 @@
             </ul>
             <input type="submit" value="Check for Vulnerabilities">
         </form>
+        <br>
+        <a href="/"><input type="submit" value="Return to Start"/></a>
     </div>
 </body>
 </html>

@@ -10,9 +10,10 @@
         <form method="post" action="/pingResults">
             <div class="form">
                 <label for="target">Target Network / Address </label>
-                <input type="text" id="target" name="target">
+                <input type="text" id="target" name="target" value="{{networkIp}}">
             </div>
             <input type="Submit" value="Start Scan">
+            <label>Address of this machine {{selfIp}}</label>
         </form>
         <br>
         <p>This product uses the NVD API but is not endorsed or certified by the NVD</p>
