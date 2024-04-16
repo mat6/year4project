@@ -56,3 +56,16 @@ body {
   input[type="submit"]:hover {
     background-color: #0056b3;
   }
+  p{
+    text-align: center;
+    font-style: italic;
+  }
+
+  .rootWarning{
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 30px;
+    color: #ff0000;
+  }
