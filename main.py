@@ -1,11 +1,7 @@
-import nmap,nvd,json,os
-from flask import Flask, render_template, request, redirect, url_for
+import nmap,nvd,os,ctypes
+from flask import Flask, render_template, request, redirect
 from datetime import datetime
 
-if not os.path.exists("results"):
-    os.makedirs("results")
-if not os.path.exists("logs"):
-    os.makedirs("logs")
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'WkaDs7TG5]>zxb*USJe^Ma'
 
@@ -17,9 +13,34 @@ class scanResults():
 
 allResults = scanResults()
 
+def makeLogDirs():
+    if not os.path.exists("results"):
+        os.mkdir("results")
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
+
 @app.route("/")
 def index():
-    return render_template("pingScan.html")
+    try:                                #check if the user is root and make log directories
+        admin = os.getuid() == 0
+        original_umask = os.umask(0)
+        makeLogDirs()
+        os.umask(original_umask)
+    except AttributeError:
+        admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+        makeLogDirs()
+    if admin:
+        selfIp = nmap.getSelfIp()                       #grab own ip to determine default network to put in input box
+        index = selfIp.rfind(".")
+        if index != - 1:
+            networkIp = selfIp[0:index+1] + "0/24"
+            selfIp = "is " + selfIp
+        else:
+            selfIp = "could not be determined"
+            networkIp = ""
+        return render_template("pingScan.html",selfIp=selfIp,networkIp=networkIp)
+    else:
+        return render_template("noRoot.html")
 
 @app.route("/pingResults",methods=("GET","POST"))
 def pingResult():
@@ -27,7 +48,10 @@ def pingResult():
         target = request.form["target"]
         result = nmap.pingScan(target)
         allResults.pingResults = result
-        return render_template("pingResults.html",result=result)
+        if result:
+            return render_template("pingResults.html",result=result)
+        else:
+            return render_template("emptyPing.html",target=target)
     else: return redirect("/")
 
 @app.route("/versionScan",methods=("GET","POST"))

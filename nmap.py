@@ -1,6 +1,18 @@
-import nmap3, json
+import nmap3, json,socket
 from datetime import datetime
 
+#get interal ip of host machine 
+def getSelfIp():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(0)
+    try:
+        sock.connect(('192.168.1.1', 1))
+        addr = sock.getsockname()[0]
+    except Exception:
+        addr = 'Address Not Found'
+    finally:
+        sock.close()
+    return addr
 
 def writeLog(result,scantype):
     nmapLog = open("logs/nmap " + datetime.today().strftime("%d-%m-%Y") + ".log","a")
@@ -20,6 +32,18 @@ def removeEmptyResult(result):
             for subkey in list(result[key].keys()):
                 if ((result[key][subkey] is None) or (len(result[key][subkey]) == 0)):  #remove empty fields from result
                     result[key].pop(subkey)
+
+def removeDupe(result):
+    macList = []
+    for key in list(result.keys()):
+        if '.' in key:
+            if "macaddress" in result[key]:
+                mac = result[key]["macaddress"]["addr"]
+                if mac not in macList:
+                    macList.append(mac)
+                    continue
+                else:
+                    result.pop(key)
 
 #parse ping results, returns dict of target : dict of address,hostname and state
 def parsePing(result):
@@ -102,12 +126,14 @@ def pingScan(target):
     nmap = nmap3.NmapScanTechniques()
     result = nmap.nmap_ping_scan(target)
     removeEmptyResult(result)
+    removeDupe(result)
     writeLog(result,"Ping Scan")
     result = parsePing(result)
     return result
 
 #os scan REQUIRES ROOT
 def osScan(target):
+    print(target)
     nmap = nmap3.Nmap()
     result = nmap.nmap_os_detection(target)
     removeEmptyResult(result)

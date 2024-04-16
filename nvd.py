@@ -1,4 +1,4 @@
-import nvdlib,json
+import nvdlib
 from datetime import datetime
 
 #get api key from file for use with nvd api
@@ -20,10 +20,10 @@ def getCVE(result):
     nvdLog.write(str(datetime.now()) + ": CPEs :\n")
     for cpe in result:
         try:
-            curCpe = nvdlib.searchCVE(cpeName=cpe,key=key,limit=5)      #try to find cpe with exact search
+            curCpe = nvdlib.searchCVE(cpeName=cpe,key=key,delay=0.6,limit=5)      #try to find cpe with exact search
         except:
             try:
-                curCpe = nvdlib.searchCVE(virtualMatchString=cpe,key=key,limit=5)       #if exact search fails to find a cpe try a looser search
+                curCpe = nvdlib.searchCVE(virtualMatchString=cpe,key=key,delay=0.6,limit=5)       #if exact search fails to find a cpe try a looser search
             except Exception as error:
                 nvdLog.write("Error in retrieving CVEs for CPE - " + str(cpe) + " - Exception: " + str(error) + "\n")
                 curCpe = "CPE Not Found"                              #catch exception for cpe not found
@@ -60,7 +60,7 @@ def parseCVE(input):
                     cveEntry["References to Advisories, Solutions, and Tools"] = refUrls
                     cpeList.append(cveEntry)
             else:
-                cveEntry = {"Error" : input[host][cpe]}
+                cveEntry = {"None Found" : input[host][cpe]}
                 cpeList.append(cveEntry)
             parsedCpes[cpe] = cpeList
         parsedResult[host] = parsedCpes
