@@ -20,10 +20,16 @@ def getCVE(result):
     nvdLog.write(str(datetime.now()) + ": CPEs :\n")
     for cpe in result:
         try:
-            curCpe = nvdlib.searchCVE(cpeName=cpe,key=key,delay=0.6,limit=5)      #try to find cpe with exact search
+            if key:
+                curCpe = nvdlib.searchCVE(cpeName=cpe,key=key,delay=0.6,limit=5)      #try to find cpe with exact search
+            else:
+                curCpe = nvdlib.searchCVE(cpeName=cpe,limit=5)
         except:
             try:
-                curCpe = nvdlib.searchCVE(virtualMatchString=cpe,key=key,delay=0.6,limit=5)       #if exact search fails to find a cpe try a looser search
+                if key:
+                    curCpe = nvdlib.searchCVE(virtualMatchString=cpe,key=key,delay=0.6,limit=5)       #if exact search fails to find a cpe try a looser search
+                else:
+                    curCpe = nvdlib.searchCVE(virtualMatchString=cpe,limit=5)
             except Exception as error:
                 nvdLog.write("Error in retrieving CVEs for CPE - " + str(cpe) + " - Exception: " + str(error) + "\n")
                 curCpe = "CPE Not Found"                              #catch exception for cpe not found
