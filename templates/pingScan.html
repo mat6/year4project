@@ -2,6 +2,7 @@
 <html>
 <head>
     <link rel="stylesheet" href="/static/pingScan.css">
+    <link rel="shortcut icon" href="/static/favicon.png">
 </head>
 <title>Home Network Security Analyzer</title>
 <body>
@@ -9,11 +10,11 @@
         <h1>Scan Network</h1>
         <form method="post" action="/pingResults">
             <div class="form">
-                <label for="target">Target Network / Address </label>
+                <label for="target">Target Network / Identifier(IP Address) </label>
                 <input type="text" id="target" name="target" value="{{networkIp}}">
             </div>
-            <input type="Submit" value="Start Scan">
-            <label>Address of this machine {{selfIp}}</label>
+            <input type="Submit" value="Find Devices on Network">
+            <label>Identifier(IP Address) of this machine {{selfIp}}</label>
         </form>
         <br>
         <p>This product uses the NVD API but is not endorsed or certified by the NVD</p>

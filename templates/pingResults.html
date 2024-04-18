@@ -3,11 +3,13 @@
 <head>
     <link rel="stylesheet" href="/static/pingResult.css">
     <script type="text/javascript" src="/static/requireCheck.js"></script>
+    <link rel="shortcut icon" href="/static/favicon.png">
 </head>
 <title>Home Network Security Analyzer</title>
 <body>
     <div class="main">
-        <h1>Ping Discovery Results</h1>
+        <h1>Devices Found on {{target}}</h1>
+        <p>Select devices to gather more information on</p>
         <form method="post" action="/osScan">
             <ul class="list">
                 {% for key in result%}
@@ -17,7 +19,7 @@
                     </li>
                 {% endfor %}
             </ul>
-            <input type="submit" value="OS Scan">
+            <input type="submit" value="Start OS Scan">
         </form>
         <br>
         <a href="/"><input type="submit" value="Return to Start"/></a>

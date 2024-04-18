@@ -3,11 +3,13 @@
 <head>
     <link rel="stylesheet" href="/static/osScan.css">
     <script type="text/javascript" src="/static/requireCheck.js"></script>
+    <link rel="shortcut icon" href="/static/favicon.png">
 </head>
 <title>Home Network Security Analyzer</title>
 <body>
     <div class="main">
-        <h1>OS Scan Results</h1>
+        <h1>Device Info</h1>
+        <p>Select Devices to Check for Vulnerabilities</p>
         <form method="post" action="/vulnCheck">
             <ul class="list">
                 {% for host in result%}

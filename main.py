@@ -21,6 +21,7 @@ def makeLogDirs():
 
 @app.route("/")
 def index():
+    message = "Sudo"
     try:                                #check if the user is root and make log directories
         admin = os.getuid() == 0
         original_umask = os.umask(0)
@@ -28,6 +29,7 @@ def index():
         os.umask(original_umask)
     except AttributeError:
         admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+        message = "Admin"
         makeLogDirs()
     if admin:
         selfIp = nmap.getSelfIp()                       #grab own ip to determine default network to put in input box
@@ -40,7 +42,7 @@ def index():
             networkIp = ""
         return render_template("pingScan.html",selfIp=selfIp,networkIp=networkIp)
     else:
-        return render_template("noRoot.html")
+        return render_template("noRoot.html",message=message)
 
 @app.route("/pingResults",methods=("GET","POST"))
 def pingResult():
@@ -49,7 +51,7 @@ def pingResult():
         result = nmap.pingScan(target)
         allResults.pingResults = result
         if result:
-            return render_template("pingResults.html",result=result)
+            return render_template("pingResults.html",result=result,target=target)
         else:
             return render_template("emptyPing.html",target=target)
     else: return redirect("/")

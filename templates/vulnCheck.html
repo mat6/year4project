@@ -2,15 +2,17 @@
 <html>
 <head>
     <link rel="stylesheet" href="/static/vulnCheck.css">
+    <link rel="shortcut icon" href="/static/favicon.png">
 </head>
 <title>Vulnerabilities</title>
 <body>
     <div class="main">
+    <h1>Vulnerabilities for the following devices:</h1>
     {% for host in result%}
-        <h1>{{ host }}</h1>
+        <h2>{{ host }}</h2>
         <div class="list">
         {%for cpe in result[host]%}
-            <h2>{{ cpe }}</h2>
+            <h3>{{ cpe }}</h3>
             <div class = "cpe">
             {% for cve in result[host][cpe] %}
                 {% for item in cve %}
